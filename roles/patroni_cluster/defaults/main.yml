@@ -5,13 +5,24 @@ apt_patroni_packages:
   - python3-dev
   - libpq-dev
 
-app_db_host: "127.0.0.1"
-app_db_name: "test"
-app_db_user: "postgres"
-app_db_pass: "postgres033"
+pg_db_host: "127.0.0.1"
+pg_db_name: "test"
+pg_db_user: "postgres"
+pg_db_pass: "postgres033"
 
-app_repo: "https://github.com/redmine/redmine.git"
-app_home: /opt/redmine
-app_version: 4.0-stable
-app_lang: "ru"
-app_fqdn: "redmine.example.com"
+#app_repo: "https://github.com/redmine/redmine.git"
+#app_home: /opt/redmine
+#app_version: 4.0-stable
+#app_lang: "ru"
+#app_fqdn: "redmine.example.com"
+
+
+servers_list:
+  debian: 10.13.210.52
+  srv-web-02: 10.12.1.19
+  srv-web-02_2: 10.12.1.27
+  srv-web-02_1: 10.12.1.25
+
+patroni_yml_name: member_52
+
+patroni_yml_scope: patroni_cluster_1

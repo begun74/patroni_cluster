@@ -15,9 +15,9 @@
 - name: Postgresql. Install and setup
 #  block:
 #  - template: 
-#      src: .my.cnf 
-#      dest: ~/.my.cnf 
-#      owner: root 
+#      src: pg_hba.conf 
+#      dest: /etc/postgresql/12/main/pg_hba.conf 
+#      owner: postgres 
 #      mode: 0600
   service:
       name: postgresql
@@ -39,8 +39,42 @@
 
 #  Pip. install patroni
 - name: Pip. install patroni
-  shell: pip3 install patroni
+  shell: pip3 install patroni python-etcd
 
   tags:
     - pip
+
+- name: Copy configuration files for patroni on {{ansible_hostname}}
+  template:
+    src: patroni.yml.j2
+    dest: "/etc/patroni.yml"
+
+  tags:
+    - pyml  
+
+### Install haproxy
+
+- name: Apt. Install haproxy
+  apt:
+    name: haproxy
+    state: latest
+   
+  tags:
+     - haproxy
+
+- name: Copy configuration files for haproxy
+  template:
+    src: haproxy.cfg.j2
+    dest: "/etc/haproxy/haproxy.cfg"
+
+  tags:
+    - ccf
+
+- name: Restart haproxy
+  service:
+      name: haproxy
+      state: restarted
+      enabled: yes
+  tags:
+    - cfg_haproxy
 
