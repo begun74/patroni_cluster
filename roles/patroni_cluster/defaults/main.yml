@@ -1,0 +1,17 @@
+---
+apt_patroni_packages:
+  - postgresql
+  - python3-pip
+  - python3-dev
+  - libpq-dev
+
+app_db_host: "127.0.0.1"
+app_db_name: "test"
+app_db_user: "postgres"
+app_db_pass: "postgres033"
+
+app_repo: "https://github.com/redmine/redmine.git"
+app_home: /opt/redmine
+app_version: 4.0-stable
+app_lang: "ru"
+app_fqdn: "redmine.example.com"

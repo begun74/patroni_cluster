@@ -1,0 +1,46 @@
+---
+- name: APT. Update repository cache
+  apt: 
+    update_cache: yes
+  tags:
+    - done
+
+- name: Patroni. Install packages
+  apt:
+    name: "{{ apt_patroni_packages }}"
+    state: latest
+  tags:
+    - done
+
+- name: Postgresql. Install and setup
+#  block:
+#  - template: 
+#      src: .my.cnf 
+#      dest: ~/.my.cnf 
+#      owner: root 
+#      mode: 0600
+  service:
+      name: postgresql
+      state: restarted
+      enabled: yes
+  tags:
+    - done
+
+- name: Pip. Upgrade
+  shell: pip install --upgrade pip
+
+  tags: pip
+
+- name: Pip. install psycopg2-binary
+  shell: pip install psycopg2>=2.5.4
+
+  tags:
+    - pip
+
+#  Pip. install patroni
+- name: Pip. install patroni
+  shell: pip3 install patroni
+
+  tags:
+    - pip
+

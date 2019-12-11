@@ -1,9 +1,14 @@
 ---
-hosts:
-   node2:
+servers:
+  hosts:
+    debian_virt:
 
-all_redmine:
+all_hosts:
   children:
+    ec_htp:
+      vars:
+        full_name: "Patroni servers"
       hosts:
-        node2:
-          ansible_host: 10.13.210.52
+        debian_virt:
+#          ansible_user: vagrant
+          ansible_connection: local
