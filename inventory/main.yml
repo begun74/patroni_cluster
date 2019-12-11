@@ -1,0 +1,9 @@
+---
+hosts:
+   node2:
+
+all_redmine:
+  children:
+      hosts:
+        node2:
+          ansible_host: 10.13.210.52
