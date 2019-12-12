@@ -23,6 +23,8 @@ servers_list:
   srv-web-02_2: 10.12.1.27
   srv-web-02_1: 10.12.1.25
 
+
 patroni_yml_name: member_52
 
 patroni_yml_scope: patroni_cluster_1
+

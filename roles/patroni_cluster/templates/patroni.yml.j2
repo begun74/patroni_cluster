@@ -5,7 +5,7 @@ name: {{ansible_hostname}}
 
 restapi:
     listen: 0.0.0.0:8008
-    connect_address: 10.12.1.25:8008
+    connect_address: {{servers_list[ansible_hostname]}}:8008
 
 etcd:
     host: 127.0.0.1:2379
@@ -25,15 +25,17 @@ bootstrap:
     - data-checksums
 
     pg_hba:
-    - host replication replicator 127.0.0.1/32 trust
-    - host replication replicator 10.12.1.0/0    trust
-    - host replication replicator 10.12.1.19/0 md5
-    - host replication replicator 10.12.1.25/0 md5
-    - host replication replicator 10.12.1.27/0 md5
+      - host replication replicator 127.0.0.1/32 trust
+      - host replication replicator 10.12.1.0/0    trust
+{% if servers_list is defined %}
+{% for key, value in servers_list.items() %}
+      - host replication replicator {{ value }}/0 md5
+{% endfor  %}
+{% endif %}
+      - host all all 10.12.1.0/0    trust
+      - host all all 0.0.0.0/0 md5
 
-    - host all all 10.12.1.0/0    trust
 
-    - host all all 0.0.0.0/0 md5
 
     users:
         postgres:
