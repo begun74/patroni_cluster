@@ -1,24 +1,42 @@
 ---
+- name: Edit /etc/hosts
+  template:
+    src: hosts.j2
+    dest: "/etc/hosts"
+    backup: yes
+
+  tags:
+    - hosts
+
+
+- name: Postgesql GPG key
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+  tags: pg
+
+- name: Postgresql. Upgrade
+  shell: echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | tee  /etc/apt/sources.list.d/pgdg.list
+  tags: pg
+
+
+
 - name: APT. Update repository cache
   apt: 
     update_cache: yes
   tags:
-    - done
+    - updt
+
+
 
 - name: Patroni. Install packages
   apt:
     name: "{{ apt_patroni_packages }}"
     state: latest
   tags:
-    - done
+    - updt
 
-- name: Postgresql. Install and setup
-#  block:
-#  - template: 
-#      src: pg_hba.conf 
-#      dest: /etc/postgresql/12/main/pg_hba.conf 
-#      owner: postgres 
-#      mode: 0600
+- name: Postgresql. Restart
   service:
       name: postgresql
       state: restarted
@@ -26,20 +44,63 @@
   tags:
     - done
 
-- name: Pip. Upgrade
-  shell: pip install --upgrade pip
+
+- name: Create Postgresql replicator User
+  shell: psql -p 5433 -c "DROP ROLE IF EXISTS replicator; CREATE USER replicator REPLICATION LOGIN ENCRYPTED PASSWORD 'password';"
+  become: yes
+  become_user: postgres
+  tags:
+   - psql
+
+- name: Etcd install
+  shell: wget https://github.com/coreos/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-amd64.tar.gz && tar -xvf etcd-{{ etcd_version }}-linux-amd64.tar.gz -C /usr/local/bin/ --strip-components=1
+
+  tags: 
+    - etcd
+
+
+- name: Etcd.service install
+  template:
+    src: etcd.service.j2
+    dest: "/etc/systemd/system/etcd.service"
+    backup: yes
+  tags:
+    - etcd
+
+- name: Etcd.env install
+  template:
+    src: etcd.env.j2
+    dest: "/etc/etcd.env"
+    backup: yes
+  tags:
+    - etcd
+
+
+- name: etcd_data_dir
+  file:
+    path: "{{etcd_data_dir}}"
+    owner: root
+    group: root
+    recurse: yes
+  tags:
+    - etcd
+
+
+
+- name: Pip3. Upgrade
+  shell: pip3 install --upgrade pip
 
   tags: pip
 
-- name: Pip. install psycopg2-binary
-  shell: pip install psycopg2>=2.5.4
+- name: Pip3. install psycopg2>=2.5.4
+  shell: pip3 install psycopg2>=2.5.4
 
   tags:
     - pip
 
-#  Pip. install patroni
-- name: Pip. install patroni
-  shell: pip3 install patroni python-etcd
+#  Pip. Install patroni python-etcd
+- name: Pip3. install patroni psycopg2
+  shell: pip3 install patroni python-etcd psycopg2
 
   tags:
     - pip
@@ -51,6 +112,21 @@
 
   tags:
     - pyml  
+
+- name: Copy patroni.service to /etc/systemd/system/patroni.service
+  template:
+    src: patroni.service
+    dest: "/etc/systemd/system/patroni.service"
+    backup: yes
+  tags:
+    - pyml
+
+- name: Create /data/patroni
+  file: 
+    path: /data/patroni
+    state: directory
+    owner: postgres
+    group: postgres
 
 ### Install haproxy
 

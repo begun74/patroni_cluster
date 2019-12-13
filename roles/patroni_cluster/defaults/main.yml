@@ -1,30 +1,41 @@
 ---
 apt_patroni_packages:
-  - postgresql
+  - postgresql-12
   - python3-pip
   - python3-dev
   - libpq-dev
+  - wget
+  - gnupg2
+  - sudo
+
+etcd_repo: https://github.com/coreos/etcd/releases/download/v3.3.10/etcd-v3.3.10-linux-amd64.tar.gz
+
+etcd_version: v3.3.10
+
+etcd_token: 843c4abe-4e8f-4add-8c70-516206dae53b
+
+etc_peer_urls_port: 2380
+
+etcd_data_dir: /var/lib/etcd
+
+
 
 pg_db_host: "127.0.0.1"
 pg_db_name: "test"
 pg_db_user: "postgres"
 pg_db_pass: "postgres033"
-
-#app_repo: "https://github.com/redmine/redmine.git"
-#app_home: /opt/redmine
-#app_version: 4.0-stable
-#app_lang: "ru"
-#app_fqdn: "redmine.example.com"
+pg_db_port: 5433
 
 
 servers_list:
-  debian: 10.13.210.52
-  srv-web-02: 10.12.1.19
+  srv-web-02_3: 10.13.210.52
   srv-web-02_2: 10.12.1.27
   srv-web-02_1: 10.12.1.25
-
+  srv-web-02: 10.12.1.19
 
 patroni_yml_name: member_52
 
 patroni_yml_scope: patroni_cluster_1
 
+replication_user: replicator
+replication_pass: password

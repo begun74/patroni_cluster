@@ -38,25 +38,25 @@ bootstrap:
 
 
     users:
-        postgres:
-            password: postgres033
+        {{pg_db_user}}:
+            password: {{pg_db_pass}}
             options:
                 - createrole
                 - createdb
 
 postgresql:
-    listen: 0.0.0.0:5434
-    connect_address: 10.12.1.25:5434
+    listen: 0.0.0.0:{{pg_db_port}}
+    connect_address: {{servers_list[ansible_hostname]}}:{{pg_db_port}}
     bin_dir: /usr/lib/postgresql/11/bin/
     data_dir: /data/patroni
     pgpass: /tmp/pgpass
     authentication:
         replication:
-            username: replicator
-            password: password
+            username: {{replication_user}}
+            password: {{replication_pass}}
         superuser:
-            username: postgres
-            password: postgres033
+            username: {{pg_db_user}}
+            password: {{pg_db_pass}}
     parameters:
         unix_socket_directories: '.'
 

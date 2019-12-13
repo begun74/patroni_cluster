@@ -1,0 +1,31 @@
+[Unit]
+Description=etcd
+Documentation=https://github.com/coreos/etcd
+Conflicts=etcd.service
+Conflicts=etcd2.service
+
+[Service]
+EnvironmentFile=/etc/etcd.env
+Type=notify
+Restart=always
+RestartSec=5s
+LimitNOFILE=40000
+TimeoutStartSec=0
+
+ExecStart=/usr/local/bin/etcd --name {{ansible_hostname}} --data-dir {{ etcd_data_dir }} \
+                              --listen-client-urls http://0.0.0.0:2379,http://0.0.0.0:4001 \
+                              --advertise-client-urls http://{{servers_list[ansible_hostname]}}:2379,http://{{servers_list[ansible_hostname]}}:4001 \
+                              --listen-peer-urls http://0.0.0.0:{{etc_peer_urls_port}} \
+                              --initial-advertise-peer-urls http://{{servers_list[ansible_hostname]}}:{{etc_peer_urls_port}} \
+                              --initial-cluster \
+{% if servers_list is defined %}
+{% for name, ip in servers_list.items() %}
+{{ name }}=http://{{ ip }}:{{etc_peer_urls_port}},\
+{% endfor  %}
+{% endif %}
+                              --initial-cluster-token "{{ etcd_token }}" \
+                              --initial-cluster-state=new
+
+[Install]
+WantedBy=multi-user.target
+
