@@ -1,0 +1,4 @@
+mkdir /data/patroni/
+chown -R postgres.postgres  /data/patroni/
+
+patronictl -d etcd://localhost:2379 list patroni_cluster_1
